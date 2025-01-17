@@ -1,21 +1,8 @@
-import { createCheerioRouter } from 'crawlee';
+import { Router } from "express";
+import crawlerController from "./crawler/crawler.controller.js";
 
-export const router = createCheerioRouter();
+const router = Router();
 
-router.addDefaultHandler(async ({ enqueueLinks, log }) => {
-    log.info(`enqueueing new URLs`);
-    await enqueueLinks({
-        globs: ['https://crawlee.dev/**'],
-        label: 'detail',
-    });
-});
+router.get('/crawler', crawlerController.crawl);
 
-router.addHandler('detail', async ({ request, $, log, pushData }) => {
-    const title = $('title').text();
-    log.info(`${title}`, { url: request.loadedUrl });
-
-    await pushData({
-        url: request.loadedUrl,
-        title,
-    });
-});
+export default router;

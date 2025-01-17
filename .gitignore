@@ -1,5 +1,5 @@
 # This file tells Git which files shouldn't be added to source control
-
+build
 .idea
 dist
 node_modules
@@ -8,3 +8,4 @@ Dockerfile
 .env
 .dockerignore
 package-lock.json
+.vscode
