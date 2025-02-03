@@ -1,5 +1,7 @@
+import path from "path";
 import { ILoggerClientMethods } from "../logger.type";
 import * as Winston from 'winston';
+import DailyRotationFile from 'winston-daily-rotate-file'
 
 class WinstonService implements ILoggerClientMethods {
   private static instance: WinstonService;
@@ -13,6 +15,8 @@ class WinstonService implements ILoggerClientMethods {
   }
 
   private constructor() {
+    const logDir = path.resolve("./logs");
+    console.log(logDir);
     this.winston = Winston.createLogger({
       levels: {
         'error': 0,
@@ -32,6 +36,14 @@ class WinstonService implements ILoggerClientMethods {
       ),
       transports: [
         new Winston.transports.Console(),
+        new DailyRotationFile({
+          dirname: logDir,
+          filename: '%DATE%.log',
+          datePattern: 'YYYY-MM-DD',
+          zippedArchive: true,
+          maxSize: '20m',
+          maxFiles: '14d',
+        })
       ],
     })
   }

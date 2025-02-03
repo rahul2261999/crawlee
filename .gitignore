@@ -9,3 +9,4 @@ Dockerfile
 .dockerignore
 package-lock.json
 .vscode
+logs

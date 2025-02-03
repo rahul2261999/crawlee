@@ -12,6 +12,7 @@
     "tsc-watch": "^6.2.1",
     "uuid": "^11.0.5",
     "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {

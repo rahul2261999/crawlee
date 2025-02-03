@@ -2,7 +2,7 @@ import { sortBy } from "lodash";
 import { ELoggerDataOrder } from "./logger.enum";
 import { ILoggerClientMethods, ILoggerData, ILoggerServiceMethods } from "./logger.type";
 import winstonService from "./winston/winston.service";
-import { asyncLocalStorage } from "../helper/store.util";
+import { asyncContextStore } from "../helper/async_context_store.util";
 
 
 class LoggingService implements ILoggerServiceMethods {
@@ -14,7 +14,6 @@ class LoggingService implements ILoggerServiceMethods {
     this.loggerClient = loggerCient;
     
     this.loggerDataOrder = {
-      correlationId: ELoggerDataOrder.correlationId,
       controller: ELoggerDataOrder.controller,
       serviceName: ELoggerDataOrder.serviceName,
       function: ELoggerDataOrder.function,
@@ -44,17 +43,13 @@ class LoggingService implements ILoggerServiceMethods {
     return finalMessage.join('--->')
   }
 
-  private getCorrelationId() {
-    const store = asyncLocalStorage.getStore();
-    const correlationId = store?.get('correlationId') ?? '-';
-
-    return correlationId;
+  private getTracingId() {
+    return asyncContextStore.getTraceId();
   }
 
   public info(message: ILoggerData | string): void {
-    
-
-    let formmatedMessage: string = `correlationId: ${this.getCorrelationId()} --> `;
+    const tracingId = this.getTracingId();
+    let formmatedMessage: string = tracingId ? `tracingId: ${this.getTracingId()} --> `: '';
 
     if (typeof message !== 'string') {
       formmatedMessage += this.formatter(message);
@@ -66,7 +61,8 @@ class LoggingService implements ILoggerServiceMethods {
   }
 
   public debug(message: ILoggerData | string): void {
-    let formmatedMessage: string = `correlationId: ${this.getCorrelationId()} --> `;
+    const tracingId = this.getTracingId();
+    let formmatedMessage: string = tracingId ? `tracingId: ${this.getTracingId()} --> `: '';
 
     if (typeof message !== 'string') {
       formmatedMessage += this.formatter(message);
@@ -78,7 +74,8 @@ class LoggingService implements ILoggerServiceMethods {
   }
 
   public warn(message: ILoggerData | string | null, option?: { error?: Error; }): void {
-    let formmatedMessage: string = `correlationId: ${this.getCorrelationId()} --> `;
+    const tracingId = this.getTracingId();
+    let formmatedMessage: string = tracingId ? `tracingId: ${this.getTracingId()} --> `: '';
 
     if (message !== null) {
       if (typeof message !== 'string') {
@@ -92,10 +89,8 @@ class LoggingService implements ILoggerServiceMethods {
   }
 
   public error(message: ILoggerData | string | null, option?: { error?: Error; }): void {
-    const store = asyncLocalStorage.getStore();
-    const correlationId = store?.get('correlationId') ?? '-';
-
-    let formmatedMessage: string = `correlationId: ${this.getCorrelationId()} --> `;
+    const tracingId = this.getTracingId();
+    let formmatedMessage: string = tracingId ? `tracingId: ${this.getTracingId()} --> `: '';
 
     if (message !== null) {
       if (typeof message !== 'string') {
